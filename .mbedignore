@@ -1,0 +1,5 @@
+source/platform/linux/*
+__x86_x64_NativeLinux_mbedtls/*
+lwm2m-resource/*
+venv/*
+mbed-cloud-client/libs/mbed-coap/*
