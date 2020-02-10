@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
+  <Object ObjectType="MODefinition">
+    <Name>Button Object</Name>
+    <Description1><![CDATA[This object provides a range of information related to device metadata]]></Description1>
+    <ObjectID>3200</ObjectID>
+    <ObjectURN>urn:oma:lwm2m:x:3200</ObjectURN>
+    <LWM2MVersion>1.0</LWM2MVersion>
+    <ObjectVersion>1.0</ObjectVersion>
+    <MultipleInstances>Single</MultipleInstances>
+    <Mandatory>Mandatory</Mandatory>
+    <Resources>
+      <Item ID="5501">
+        <Name>button_resource</Name>
+        <Operations>R</Operations>
+        <MultipleInstances>Single</MultipleInstances>
+        <Mandatory>Mandatory</Mandatory>
+        <Type>Integer</Type>
+        <RangeEnumeration>
+        </RangeEnumeration>
+        <Units>
+        </Units>
+        <Description><![CDATA[Button resource]]></Description>
+      </Item>
+    </Resources>
+    <Description2 />
+  </Object>
+</LWM2M>

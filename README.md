@@ -1,6 +1,4 @@
-# Device Management Client Lite
+The full documentation for this example is [available on our documentation site](https://www.pelion.com/docs/device-management/current/connecting/device-management-client-tutorials.html).
 
-This repository contains Pelion Device Management Client Lite: a library that connects devices to Pelion Device Management service and to cloud services from our partners.
-
-Report your concerns about the documentation or the software as issues in the [Pelion Client Lite repository](https://github.com/ARMmbed/pelion-client-lite/issues).
+You can report concerns about the documentation or this SW as issues to [this GitHub repository](https://github.com/ARMmbed/mbed-cloud-client-example/issues).
 
