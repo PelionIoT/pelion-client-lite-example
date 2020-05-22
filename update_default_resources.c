@@ -3,7 +3,7 @@
 // only be used by a person authorised under and to the extent permitted
 // by a subsisting licensing agreement from ARM Limited or its affiliates.
 //
-// (C) COPYRIGHT 2016 ARM Limited or its affiliates.
+// (C) COPYRIGHT 2016-2020 ARM Limited or its affiliates.
 // ALL RIGHTS RESERVED
 //
 // This entire notice must be reproduced on all copies of this file
@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 
-#ifdef MBED_CLOUD_CLIENT_SUPPORT_UPDATE
+#ifdef MBED_CLOUD_CLIENT_FOTA_ENABLE
 
 #warning "Please run manifest-tool init ... to generate proper update certificates, or disable MBED_CLOUD_CLIENT_SUPPORT_UPDATE"
 
@@ -50,5 +50,5 @@ const uint8_t arm_uc_default_psk_id[1] = { 0 };
 const uint8_t arm_uc_default_psk_id_size = sizeof(arm_uc_default_psk_id);
 #endif
 
-#endif // MBED_CLOUD_CLIENT_SUPPORT_UPDATE
+#endif // MBED_CLOUD_CLIENT_FOTA_ENABLE
 
