@@ -60,6 +60,15 @@ static bool init_example_resources();
 static void update_progress(uint32_t progress, uint32_t total);
 #endif
 
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+static void sleep_callback_function(void* context)
+{
+    // context is lwm2m_interface pointer
+    (void)context;
+    printf("Client is going to sleep\n");
+}
+#endif
+
 static registry_status_t button_callback(registry_callback_type_t type,
                                         const registry_path_t *path,
                                         const registry_callback_token_t *token,
@@ -327,6 +336,10 @@ void init_pdmc_client(void)
     pdmc_event_handler_id = eventOS_event_handler_create(pdmc_event_handler, 0);
 
     pdmc_connect_init(pdmc_event_handler_id);
+
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+        lwm2m_interface_set_queue_sleep_handler(pdmc_connect_get_interface(), sleep_callback_function);
+#endif
 
     if (!init_example_resources()) {
         printf("Failed to create resources - exit!\n");

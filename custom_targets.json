@@ -1,0 +1,5 @@
+{
+    "DISCO_L475VG_IOT01A_CELLULAR_ALTAIR": {
+        "inherits"                          : ["DISCO_L475VG_IOT01A"]
+    }
+}

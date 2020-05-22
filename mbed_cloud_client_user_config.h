@@ -21,7 +21,10 @@
 #define MBED_CLOUD_CLIENT_USER_CONFIG_H
 
 #define MBED_CLOUD_CLIENT_ENDPOINT_TYPE             "default"
+
+#if !defined(MBED_CLOUD_CLIENT_LIFETIME)
 #define MBED_CLOUD_CLIENT_LIFETIME                  86400       /* 24 hours */
+#endif
 
 #if !defined(MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP) && !defined(MBED_CLOUD_CLIENT_TRANSPORT_MODE_TCP) && !defined(MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE)
 #define MBED_CLOUD_CLIENT_TRANSPORT_MODE_TCP
@@ -33,26 +36,31 @@
     #define SN_COAP_MAX_BLOCKWISE_PAYLOAD_SIZE      512
 #endif
 
-#define MBED_CLOUD_CLIENT_SUPPORT_UPDATE
+#define MBED_CLOUD_CLIENT_FOTA_ENABLE 1
 
-/* Sets the download buffer for update client in bytes (min. 1024 bytes).
- * This must be at least twice the SN_COAP_MAX_BLOCKWISE_PAYLOAD_SIZE value.
- */
-#ifdef MBED_CONF_APP_MBED_CLOUD_CLIENT_UPDATE_BUFFER_SIZE
-#define MBED_CLOUD_CLIENT_UPDATE_BUFFER MBED_CONF_APP_MBED_CLOUD_CLIENT_UPDATE_BUFFER_SIZE
-#else
-#define MBED_CLOUD_CLIENT_UPDATE_BUFFER             1024
-#endif // #ifdef MBED_CONF_APP_MBED_CLOUD_CLIENT_UPDATE_BUFFER_SIZE
-
-/* Developer flags for Update feature */
-#if defined(MBED_CONF_APP_DEVELOPER_MODE) &&  (MBED_CONF_APP_DEVELOPER_MODE == 1)
-    #define MBED_CLOUD_DEV_UPDATE_CERT
+// Update Client definitions
+#if MBED_CONF_APP_DEVELOPER_MODE == 1
     #define MBED_CLOUD_DEV_UPDATE_ID
-#endif /* MBED_CONF_APP_DEVELOPER_MODE */
+    #define MBED_CLOUD_DEV_UPDATE_CERT
+#endif
+
+// FOTA support for bootloader header version 2.
+#define MBED_CLOUD_CLIENT_FOTA_FW_HEADER_VERSION 2
+
+// FOTA support for manifest version 1.
+#define FOTA_MANIFEST_SCHEMA_VERSION 1
+
+// Enable if bootloader supports encryption.
+#define MBED_CLOUD_CLIENT_FOTA_ENCRYPTION_SUPPORT 0
 
 #define USER_OMA_OBJECT_FILE "user_oma_lwm2m_object_defs.h"
 
 #define PROTOMAN_SECURITY_ENABLE_CERTIFICATE
+
+#if defined (PROTOMAN_USE_SSL_SESSION_RESUME) && (PROTOMAN_USE_SSL_SESSION_RESUME == 0)
+#undef PROTOMAN_USE_SSL_SESSION_RESUME
+#else
 #define PROTOMAN_USE_SSL_SESSION_RESUME
+#endif
 
 #endif /* MBED_CLOUD_CLIENT_USER_CONFIG_H */
