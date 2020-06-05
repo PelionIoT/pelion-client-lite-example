@@ -56,7 +56,7 @@
             "target.features_add"                       : ["BOOTLOADER"],
             "target.macros_add"                         : ["DISABLE_ERROR_DESCRIPTION=1",
                                                            "MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE",
-                                                           "MBED_CLOUD_CLIENT_LIFETIME=300"],
+                                                           "MBED_CLOUD_CLIENT_LIFETIME=600"],
             "platform.stdio-baud-rate"                  : 115200,
             "platform.stdio-convert-newlines"           : true,
             "platform.stdio-buffered-serial"            : false,
