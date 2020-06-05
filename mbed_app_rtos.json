@@ -56,7 +56,7 @@
             "target.app_offset"                         : "0x8400",
             "target.restrict_size"                      : "0x77C00",
             "target.macros_add"                         : ["MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE",
-                                                           "MBED_CLOUD_CLIENT_LIFETIME=300"],
+                                                           "MBED_CLOUD_CLIENT_LIFETIME=600"],
             "target.components_add"                     : ["ALTAIR"],
             "target.components_remove"                  : ["QSPIF"],
             "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + 512*1024)",

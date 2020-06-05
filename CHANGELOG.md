@@ -1,5 +1,9 @@
 # Changelog for Pelion Device Management Client Lite Reference Example
 
+### Release 1.1.1-lite (05.06.2020)
+
+Increased the default lifetime of UDP_QUEUE mode devices to 600 seconds. The earlier, shorter lifetime was causing intermittent issues where the device was unable to re-register before the lifetime expired.
+
 ### Release 1.1.0-lite (20.05.2020)
 
 * Added Pelion E2E test library v0.2.6.
