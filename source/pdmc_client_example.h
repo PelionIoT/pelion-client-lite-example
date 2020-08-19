@@ -22,6 +22,12 @@ void init_pdmc_client();
 
 void pdmc_client_close();
 
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+void pdmc_client_resume();
+
+bool is_pdmc_client_paused();
+#endif
+
 bool is_pdmc_client_register_called();
 
 #endif //PDMC_CLIENT_API_EXAMPLE_H

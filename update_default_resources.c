@@ -41,10 +41,14 @@ const uint16_t arm_uc_default_certificate_size =
     sizeof(arm_uc_default_certificate);
 #endif
 
+#ifdef MBED_CLOUD_DEV_UPDATE_RAW_PUBLIC_KEY
+const uint8_t arm_uc_update_public_key[] = { "public_key" };
+#endif
+
 #ifdef MBED_CLOUD_DEV_UPDATE_PSK
 const uint8_t arm_uc_default_psk[1] = { 0 };
 const uint8_t arm_uc_default_psk_size = sizeof(arm_uc_default_psk);
-const uint16_t arm_uc_default_psk_bits = sizeof(arm_uc_default_psk)*8;
+const uint16_t arm_uc_default_psk_bits = sizeof(arm_uc_default_psk) * 8;
 
 const uint8_t arm_uc_default_psk_id[1] = { 0 };
 const uint8_t arm_uc_default_psk_id_size = sizeof(arm_uc_default_psk_id);
