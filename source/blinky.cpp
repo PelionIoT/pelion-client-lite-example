@@ -39,7 +39,12 @@
 #define BLINKY_TASKLET_AUTOMATIC_INCREMENT_TIMER 4
 
 #define BUTTON_POLL_INTERVAL_MS 100
-#define AUTOMATIC_INCREMENT_INTERVAL_MS 5000
+
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+#define AUTOMATIC_INCREMENT_INTERVAL_MS 300000 // Update resource periodically every 300 seconds
+#else
+#define AUTOMATIC_INCREMENT_INTERVAL_MS 60000  // Update resource periodically every 60 seconds
+#endif
 
 int8_t Blinky::_tasklet = -1;
 Blinky *static_blinky = NULL;
@@ -255,7 +260,6 @@ void Blinky::handle_buttons()
 
     if (is_pdmc_client_register_called()) {
         if (button_resource_clicked()) {
-
             if (increment_button_value() != REGISTRY_STATUS_OK) {
                 printf("Failed to update button value!\n");
             } else {

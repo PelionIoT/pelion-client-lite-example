@@ -1,8 +1,20 @@
 # Changelog for Pelion Device Management Client Lite Reference Example
 
+### Release 1.2.0-lite (19.08.2020)
+
+Updated applications and bootloaders to support manifest version 3. This enables support for FOTA library features:
+- Update download resume (currently not supported for differential updates) - resume download in case power or connectivity loss.
+- Support firmware candidate encryption (useful for external storage) - disabled by default.
+- Component update - allow an application to register custom components and installers.
+- Semantic version - firmware version is reported based on the semantic version format.
+- Firmware version is reported on the `/14/0/2` resource.
+- Manifest tool v2.0.0 is required to work with this FOTA library.
+- Update x.509 certificate is replaced with a public key in uncompressed point format (X9.62) - requires less memory.
+- An application can defer the update.
+
 ### Release 1.1.1-lite (05.06.2020)
 
-Increased the default lifetime of UDP_QUEUE mode devices to 600 seconds. The earlier, shorter lifetime was causing intermittent issues where the device was unable to re-register before the lifetime expired.
+Increased the default lifetime of `UDP_QUEUE` mode devices to 600 seconds. The earlier, shorter lifetime was causing intermittent issues where the device was unable to re-register before the lifetime expired.
 
 ### Release 1.1.0-lite (20.05.2020)
 

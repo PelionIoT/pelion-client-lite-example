@@ -1,12 +1,20 @@
 {
     "macros": [
         "MBEDTLS_USER_CONFIG_FILE=\"mbedtls_mbed_client_config.h\"",
-        "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\""
+        "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
+        "MBED_BOOTLOADER_FLASH_BANK_SIZE=MBED_ROM_SIZE/2"
     ],
     "target_overrides": {
         "*": {
             "target.features_add"                       : ["BOOTLOADER"],
             "target.macros_add"                         : ["DISABLE_ERROR_DESCRIPTION=1"],
+            "target.header_format": [
+                ["magic", "const", "32le", "0x5c0253a3"],
+                ["firmwareSize", "size", "32le", ["application"]],
+                ["firmwareVersion", "const", "64le", "0x0"],
+                ["firmwareDigest", "digest", "SHA256", "application"],
+                ["precursorDigest", "digest", "SHA256", "application"]
+            ],
             "platform.stdio-baud-rate"                  : 115200,
             "platform.stdio-convert-newlines"           : true,
             "platform.stdio-buffered-serial"            : false,
@@ -25,6 +33,8 @@
             "mbed-cloud-client.storage-type"            : "KVSTORE",
             "mbed-client.enable-float-value"            : false,
             "mbed-client.event-loop-size"               : 512,
+            "fota.app-default-cb-no-print"              : false,
+            "fota.num-components"                       : 2,
             "nsapi.dns-cache-size"                      : 0,
             "nsapi.default-cellular-apn"                : "\"internet\"",
             "nsapi.default-wifi-security"               : "WPA_WPA2",
@@ -33,35 +43,32 @@
         },
         "DISCO_L475VG_IOT01A": {
             "target.network-default-interface-type"     : "WIFI",
-            "target.bootloader_img"                     : "tools/mbed-bootloader-disco_l475vg_iot01a-internal_flash-no_rot-v4.1.2.bin",
+            "target.bootloader_img"                     : "tools/mbed-bootloader-disco-l475svg-internal_flash_ec209b6.bin",
             "target.header_offset"                      : "0x8000",
-            "target.app_offset"                         : "0x8400",
-            "target.restrict_size"                      : "0x77C00",
+            "target.app_offset"                         : "0x8200",
+            "target.restrict_size"                      : "0x77E00",
             "target.components_add"                     : ["WIFI_ISM43362"],
-            "target.components_remove"                  : ["QSPIF"],
-            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + 512*1024)",
-            "storage_tdb_internal.internal_size"        : "(2*16*1024)",
+            "target.components_remove"                  : ["QSPIF"],            
+            "storage_tdb_internal.internal_size"        : "(32*1024)",
+            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE)",
             "storage.storage_type"                      : "TDB_INTERNAL",
             "ism43362.read-thread-stack-size"           : 1024,
             "ism43362.provide-default"                  : true,
             "mbed-client.sn-coap-max-blockwise-payload-size" : 512,
             "fota.block-device-type"                    : "FOTA_INTERNAL_FLASH_BD",
-            "fota.storage-start-address"                : "(MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_BASE_ADDRESS+MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE)",
-            "fota.storage-size"                         : "(512*1024-MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE)"
+            "fota.storage-start-address"                : "MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE + MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
+            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE"
         },
         "DISCO_L475VG_IOT01A_CELLULAR_ALTAIR": {
             "target.network-default-interface-type"     : "CELLULAR",
-            "target.bootloader_img"                     : "tools/mbed-bootloader-disco_l475vg_iot01a-internal_flash-no_rot-v4.1.2.bin",
+            "target.bootloader_img"                     : "tools/mbed-bootloader-disco-l475svg-internal_flash_ec209b6.bin",
             "target.header_offset"                      : "0x8000",
-            "target.app_offset"                         : "0x8400",
-            "target.restrict_size"                      : "0x77C00",
+            "target.app_offset"                         : "0x8200",
+            "target.restrict_size"                      : "0x77E00",
             "target.macros_add"                         : ["MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE",
                                                            "MBED_CLOUD_CLIENT_LIFETIME=600"],
             "target.components_add"                     : ["ALTAIR"],
             "target.components_remove"                  : ["QSPIF"],
-            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + 512*1024)",
-            "storage_tdb_internal.internal_size"        : "(2*16*1024)",
-            "storage.storage_type"                      : "TDB_INTERNAL",
             "mbed-client.reconnection-interval"         : 10,
             "mbed-client.sn-coap-duplication-max-msgs-count" : 10,
             "mbed-client.sn-coap-max-blockwise-payload-size" : 512,
@@ -84,9 +91,26 @@
             "nsapi.default-cellular-plmn"               : null,
             "nsapi.default-cellular-username"           : null,
             "nsapi.default-cellular-password"           : null,
+            "storage_tdb_internal.internal_size"        : "(32*1024)",
+            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE)",
+            "storage.storage_type"                      : "TDB_INTERNAL",
             "fota.block-device-type"                    : "FOTA_INTERNAL_FLASH_BD",
-            "fota.storage-start-address"                : "(MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_BASE_ADDRESS+MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE)",
-            "fota.storage-size"                         : "(512*1024-MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE)"
+            "fota.storage-start-address"                : "MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE + MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
+            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE"
+        },
+        "K64F": {
+            "target.network-default-interface-type"     : "ETHERNET",
+            "target.bootloader_img"                     : "tools/mbed-bootloader-k64f-internal_flash_ec209b6.bin",
+            "target.restrict_size"                      : "0x77E00",
+            "target.header_offset"                      : "0x8000",
+            "target.app_offset"                         : "0x8200",
+            "target.components_remove"                  : ["SD"],            
+            "storage.storage_type"                      : "TDB_INTERNAL",
+            "storage_tdb_internal.internal_size"        : "(32*1024)",
+            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE)",
+            "fota.block-device-type"                     : "FOTA_INTERNAL_FLASH_BD",
+            "fota.storage-start-address"                : "MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE + MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
+            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE"
         }
     },
     "config": {

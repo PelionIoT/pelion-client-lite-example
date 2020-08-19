@@ -41,6 +41,16 @@ static Blinky blinky;
 
 static bool                 registered;
 static bool                 register_called;
+
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+#define WAKE_UP_LOOP_INTERVAL_MS 300000
+#define WAKE_UP_LOOP_INIT_EVENT 0
+#define WAKE_UP_LOOP_WAKE_EVENT 1
+
+static bool                 paused;
+int8_t wake_up_handler = -1;
+#endif
+
 static int8_t               pdmc_event_handler_id;
 int16_t                     counter;
 registry_path_t             execute_path;
@@ -56,6 +66,11 @@ static void pdmc_event_handler(arm_event_t *event);
 static void send_application_response(void *);
 static bool init_example_resources();
 
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+static bool request_next_wake_up();
+static void handle_wake_up();
+#endif
+
 #ifdef MBED_CLOUD_CLIENT_SUPPORT_UPDATE
 static void update_progress(uint32_t progress, uint32_t total);
 #endif
@@ -66,6 +81,9 @@ static void sleep_callback_function(void* context)
     // context is lwm2m_interface pointer
     (void)context;
     printf("Client is going to sleep\n");
+    paused = true;
+    pdmc_connect_pause();
+    close_connection();
 }
 #endif
 
@@ -105,6 +123,10 @@ static void pdmc_client_registered(void)
     blinky.start_loop();
     blinky.request_next_loop_event();
     blinky.request_automatic_increment_event();
+#endif
+
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+    request_next_wake_up();
 #endif
 
 #ifdef MBED_HEAP_STATS_ENABLED
@@ -358,6 +380,23 @@ void pdmc_client_close()
     pdmc_connect_close();
 }
 
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+void pdmc_client_resume()
+{
+    init_connection(-1);
+    pdmc_connect_resume(get_network_interface(-1));
+    paused = false;
+    while(!registered) {
+        do_wait(1000);
+    }
+}
+
+bool is_pdmc_client_paused()
+{
+    return paused;
+}
+#endif
+
 bool is_pdmc_client_register_called()
 {
     return register_called;
@@ -422,3 +461,43 @@ void update_progress(uint32_t progress, uint32_t total)
     printf("Update progress = %" PRIu8 "%%\n", percent);
 }
 #endif // MBED_CLOUD_CLIENT_SUPPORT_UPDATE
+
+#ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+static void wake_up_event_handler_wrapper(arm_event_s *event)
+{
+    if (event->event_type == WAKE_UP_LOOP_WAKE_EVENT) {
+        handle_wake_up();
+    }
+}
+
+static bool request_next_wake_up() {
+    if (wake_up_handler < 0) {
+        wake_up_handler = eventOS_event_handler_create(wake_up_event_handler_wrapper, WAKE_UP_LOOP_INIT_EVENT);
+    }
+
+    arm_event_t event = { 0 };
+
+    event.event_type = WAKE_UP_LOOP_WAKE_EVENT;
+    event.receiver = wake_up_handler;
+    event.sender =  wake_up_handler;
+    event.data_ptr = NULL;
+    event.priority = ARM_LIB_LOW_PRIORITY_EVENT;
+
+    const int32_t delay_ticks = eventOS_event_timer_ms_to_ticks(WAKE_UP_LOOP_INTERVAL_MS);
+
+    if (eventOS_event_send_after(&event, delay_ticks) == NULL) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+static void handle_wake_up()
+{
+    request_next_wake_up();
+    if (is_pdmc_client_paused()) {
+        printf("Calling Pelion Client resume()\r\n");
+        pdmc_client_resume();
+    }
+}
+#endif

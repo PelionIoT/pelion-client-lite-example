@@ -1,7 +1,8 @@
 {
     "macros": [
         "MBEDTLS_USER_CONFIG_FILE=\"mbedtls_mbed_client_config.h\"",
-        "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\""
+        "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
+        "MBED_BOOTLOADER_FLASH_BANK_SIZE=MBED_ROM_SIZE/2"
     ],
     "requires": ["SecureStore",
                  "filesystemstore",
@@ -57,6 +58,13 @@
             "target.macros_add"                         : ["DISABLE_ERROR_DESCRIPTION=1",
                                                            "MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE",
                                                            "MBED_CLOUD_CLIENT_LIFETIME=600"],
+            "target.header_format": [
+                ["magic", "const", "32le", "0x5c0253a3"],
+                ["firmwareSize", "size", "32le", ["application"]],
+                ["firmwareVersion", "const", "64le", "0x0"],
+                ["firmwareDigest", "digest", "SHA256", "application"],
+                ["precursorDigest", "digest", "SHA256", "application"]
+            ],
             "platform.stdio-baud-rate"                  : 115200,
             "platform.stdio-convert-newlines"           : true,
             "platform.stdio-buffered-serial"            : false,
@@ -75,12 +83,15 @@
             "mbed-cloud-client.storage-type"            : "KVSTORE",
             "mbed-client.enable-float-value"            : false,
             "mbed-client.event-loop-size"               : 512,
+            "fota.app-default-cb-no-print"              : false,
             "nsapi.dns-cache-size"                      : 0,
+            "fota.num-components"                       : 2,
+            "mbed-cloud-client.storage-reset-dev-credentials": false,
             "nsapi.default-cellular-apn"                : "\"internet\""
         },
         "NRF52840_DK": {
             "target.network-default-interface-type"     : "CELLULAR",
-            "target.bootloader_img"                     : "tools/mbed-bootloader-nrf52840_dk-internal_flash-no_rot-v4.1.0-extras.hex",
+            "target.bootloader_img"                     : "tools/mbed-bootloader-nrf52840_dk-internal_flash_ec209b6.hex",
             "target.OUTPUT_EXT"                         : "hex",
             "target.components_add"                     : ["FLASHIAP"],
             "target.components_remove"                  : ["QSPIF"],
@@ -88,13 +99,10 @@
             "target.extra_labels_add"                   : ["SOFTDEVICE_NONE"],
             "target.extra_labels_remove"                : ["NORDIC_CORDIO", "CORDIO", "CORDIO_LL", "SOFTDEVICE_COMMON", "SOFTDEVICE_S140_FULL", "NORDIC_SOFTDEVICE"],
             "target.features_remove"                    : ["CRYPTOCELL310"],
+            "target.restrict_size"                      : "0x77E00",
             "target.header_offset"                      : "0x8000",
-            "target.app_offset"                         : "0x8400",
-            "target.restrict_size"                      : "0x77C00",
+            "target.app_offset"                         : "0x8200",
             "mbed-client.sn-coap-max-blockwise-payload-size" : 512,
-            "storage_tdb_internal.internal_base_address": "(512*1024)",
-            "storage_tdb_internal.internal_size"        : "(32*1024)",
-            "storage.storage_type"                      : "TDB_INTERNAL",
             "QUECTEL_BG96.provide-default"              : true,
             "cellular.debug-at"                         : false,
             "cellular.radio-access-technology"          : 3,
@@ -107,9 +115,12 @@
             "QUECTEL_BG96.rts"                          : "p36",
             "QUECTEL_BG96.pwr"                          : "P1_6",
             "QUECTEL_BG96.rst"                          : "P1_5",
+            "storage.storage_type"                      : "TDB_INTERNAL",
+            "storage_tdb_internal.internal_size"        : "(32*1024)",
+            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE)",
             "fota.block-device-type"                    : "FOTA_INTERNAL_FLASH_BD",
-            "fota.storage-start-address"                : "(MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_BASE_ADDRESS+MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE)",
-            "fota.storage-size"                         : "(512*1024-MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE)"
+            "fota.storage-start-address"                : "MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE + MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
+            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE"
         }
     },
     "config": {

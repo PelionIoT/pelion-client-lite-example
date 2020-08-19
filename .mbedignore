@@ -3,3 +3,4 @@ __x86_x64_NativeLinux_mbedtls/*
 lwm2m-resource/*
 venv/*
 delta-tool/*
+.manifest-dev-tool/*
