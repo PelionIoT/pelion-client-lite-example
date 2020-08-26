@@ -1,6 +1,10 @@
 # Changelog for Pelion Device Management Client Lite Reference Example
 
-### Release 1.2.0-lite (19.08.2020)
+### Release 1.2.1-lite (26.08.2020)
+
+Fixed handling of partially written (due to power-cut) flash pages while installing the FW candidate.
+
+### Release 1.2.0-lite (17.08.2020)
 
 Updated applications and bootloaders to support manifest version 3. This enables support for FOTA library features:
 - Update download resume (currently not supported for differential updates) - resume download in case power or connectivity loss.

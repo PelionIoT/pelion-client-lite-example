@@ -97,7 +97,7 @@
         },
         "K64F": {
             "target.network-default-interface-type"     : "WIFI",
-            "target.bootloader_img"                     : "tools/mbed-bootloader-k64f-internal_flash_ec209b6.bin",
+            "target.bootloader_img"                     : "tools/mbed-bootloader-k64f-internal_flash_27872bf.bin",
             "target.macros_remove"                      : ["MBEDTLS_CONFIG_HW_SUPPORT"],
             "target.components_add"                     : ["FLASHIAP"],
             "target.components_remove"                  : ["SD"],
