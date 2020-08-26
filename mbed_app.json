@@ -91,7 +91,7 @@
         },
         "NRF52840_DK": {
             "target.network-default-interface-type"     : "CELLULAR",
-            "target.bootloader_img"                     : "tools/mbed-bootloader-nrf52840_dk-internal_flash_ec209b6.hex",
+            "target.bootloader_img"                     : "tools/mbed-bootloader-nrf52840_dk-internal_flash_27872bf.hex",
             "target.OUTPUT_EXT"                         : "hex",
             "target.components_add"                     : ["FLASHIAP"],
             "target.components_remove"                  : ["QSPIF"],
