@@ -96,7 +96,8 @@
             "storage.storage_type"                      : "TDB_INTERNAL",
             "fota.block-device-type"                    : "FOTA_INTERNAL_FLASH_BD",
             "fota.storage-start-address"                : "MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE + MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
-            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE"
+            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
+            "ppp.thread-stacksize"                      : 1024
         },
         "K64F": {
             "target.network-default-interface-type"     : "ETHERNET",

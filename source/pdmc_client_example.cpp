@@ -22,6 +22,7 @@
 #include "pdmc_client_example.h"
 #include "dmc_connect_api.h"
 #include "ns_hal_init.h"
+#include "platform/reboot.h"
 
 #ifdef MBED_HEAP_STATS_ENABLED
 #include "memory_tests.h"
@@ -55,6 +56,11 @@ static int8_t               pdmc_event_handler_id;
 int16_t                     counter;
 registry_path_t             execute_path;
 registry_callback_token_t   execute_token;
+
+#ifndef MAX_PDMC_CLIENT_ERROR_COUNT
+#define MAX_PDMC_CLIENT_ERROR_COUNT 5
+#endif
+static int                  pdmc_client_error_count = 0;
 
 static void register_pdmc_client();
 static void pdmc_client_registered();
@@ -111,6 +117,7 @@ static registry_status_t blink_callback(registry_callback_type_t type,
 static void pdmc_client_registered(void)
 {
     registered = true;
+    pdmc_client_error_count = 0;
     printf("Client registered\n");
 
     pdmc_endpoint_info_s endpoint_info;
@@ -148,6 +155,7 @@ static void pdmc_client_unregistered(void)
 static void pdmc_client_registration_updated(void)
 {
     printf("Client registration updated\n");
+    pdmc_client_error_count = 0;
 }
 
 static void value_updated_event(void)
@@ -210,6 +218,16 @@ static void pdmc_client_error_event(lwm2m_interface_error_t error_code)
 #endif // DISABLE_ERROR_DESCRIPTION
 
     printf("Error code : %d\n", error_code);
+
+    if (error_code == LWM2M_INTERFACE_ERROR_NETWORK_ERROR ||
+        error_code == LWM2M_INTERFACE_ERROR_DNS_RESOLVING_FAILED ||
+        error_code == LWM2M_INTERFACE_ERROR_SECURE_CONNECTION_FAILED) {
+        if (++pdmc_client_error_count == MAX_PDMC_CLIENT_ERROR_COUNT) {
+            printf("Max error count %d reached, rebooting.\n\n", MAX_PDMC_CLIENT_ERROR_COUNT);
+            do_wait(1*1000);
+            mbed_client_default_reboot();
+        }
+    }
 }
 
 static void pdmc_event_handler(arm_event_t *event)
@@ -383,7 +401,13 @@ void pdmc_client_close()
 #ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
 void pdmc_client_resume()
 {
-    init_connection(-1);
+    int timeout_ms = 1000;
+    while (!init_connection(-1)){
+        // wait timeout is always doubled
+        printf("Network connect failed. Try again after %d milliseconds.\n",timeout_ms);
+        do_wait(timeout_ms);
+        timeout_ms *= 2;
+    }
     pdmc_connect_resume(get_network_interface(-1));
     paused = false;
     while(!registered) {

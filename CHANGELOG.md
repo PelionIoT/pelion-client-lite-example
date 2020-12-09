@@ -1,6 +1,10 @@
 # Changelog for Pelion Device Management Client Lite Reference Example
 
-### Release 1.2.1-lite (26.08.2020)
+### Release 1.3.0-lite (07.12.2020)
+
+- Changed how the example application behaves when network connect fails. Now the application retries to connect after a timeout.
+
+### Release 1.2.1-lite (24.08.2020)
 
 Fixed handling of partially written (due to power-cut) flash pages while installing the FW candidate.
 
