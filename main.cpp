@@ -52,10 +52,12 @@ int main(void)
     printf("Application ready\n" );
 
     (void) init_platform();
-
-    if (!init_connection(-1)) {
-        printf("ERROR - init_connection() failed!\n");
-        return false;
+    int timeout_ms = 1000;
+    while (!init_connection(-1)){
+        // wait timeout is always doubled
+        printf("Network connect failed. Try again after %d milliseconds.\n",timeout_ms);
+        do_wait(timeout_ms);
+        timeout_ms *= 2;
     }
 
     // Print some statistics of the object sizes and heap memory consumption

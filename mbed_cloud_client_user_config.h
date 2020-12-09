@@ -42,6 +42,7 @@
 #if MBED_CONF_APP_DEVELOPER_MODE == 1
 #define MBED_CLOUD_DEV_UPDATE_ID
 #define MBED_CLOUD_DEV_UPDATE_CERT
+#define MBED_CLOUD_DEV_UPDATE_RAW_PUBLIC_KEY
 #endif
 
 // FOTA support for bootloader header version 3.
@@ -52,8 +53,6 @@
 
 #define FOTA_DEFAULT_APP_IFS 1
 #define FOTA_CUSTOM_PLATFORM 1
-
-#define MBED_CLOUD_DEV_UPDATE_RAW_PUBLIC_KEY
 
 // Enable if bootloader supports encryption.
 #define MBED_CLOUD_CLIENT_FOTA_ENCRYPTION_SUPPORT 0
