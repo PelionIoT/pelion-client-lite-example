@@ -1,10 +1,10 @@
 {
     "macros": [
         "MBEDTLS_USER_CONFIG_FILE=\"mbedtls_mbed_client_config.h\"",
-        "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
-        "MBED_BOOTLOADER_FLASH_BANK_SIZE=MBED_ROM_SIZE/2"
+        "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\""
     ],
     "requires": ["SecureStore",
+                 "mbed-bootloader-NRF52840_DK-TARGET_BL_INTERNAL_FLASH",
                  "filesystemstore",
                  "filesystem",
                  "littlefs",
@@ -21,13 +21,14 @@
                  "storage",
                  "storage_tdb_internal",
                  "system-storage",
-                 "bootloader",
                  "minimal-printf",
                  "mbed-client-randlib",
                  "device_key",
                  "mbed-protocol-manager",
                  "mbed-coap",
                  "nanostack-eventloop",
+                 "nanostack-interface",
+                 "mbed-mesh-api",
                  "bare-metal",
                  "rtos-api",
                  "mbed-cloud-client",
@@ -49,22 +50,14 @@
                  "mbed-crypto",
                  "psa",
                  "nordic",
-                 "delta-tool",
                  "esp8266",
                  "fat_chan"],
     "target_overrides": {
         "*": {
-            "target.features_add"                       : ["BOOTLOADER"],
+            "target.extra_labels_add"                   : ["BL_INTERNAL_FLASH"],
             "target.macros_add"                         : ["DISABLE_ERROR_DESCRIPTION=1",
                                                            "MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE",
                                                            "MBED_CLOUD_CLIENT_LIFETIME=600"],
-            "target.header_format": [
-                ["magic", "const", "32le", "0x5c0253a3"],
-                ["firmwareSize", "size", "32le", ["application"]],
-                ["firmwareVersion", "const", "64le", "0x0"],
-                ["firmwareDigest", "digest", "SHA256", "application"],
-                ["precursorDigest", "digest", "SHA256", "application"]
-            ],
             "platform.stdio-baud-rate"                  : 115200,
             "platform.stdio-convert-newlines"           : true,
             "platform.stdio-buffered-serial"            : false,
@@ -86,12 +79,14 @@
             "fota.app-default-cb-no-print"              : false,
             "nsapi.dns-cache-size"                      : 0,
             "fota.num-components"                       : 2,
+            "storage.storage_type"                      : null,
+            "storage_tdb_internal.internal_base_address": null,
+            "storage_tdb_internal.internal_size"        : null,
             "mbed-cloud-client.storage-reset-dev-credentials": false,
             "nsapi.default-cellular-apn"                : "\"internet\""
         },
         "NRF52840_DK": {
             "target.network-default-interface-type"     : "CELLULAR",
-            "target.bootloader_img"                     : "tools/mbed-bootloader-nrf52840_dk-internal_flash_27872bf.hex",
             "target.OUTPUT_EXT"                         : "hex",
             "target.components_add"                     : ["FLASHIAP"],
             "target.components_remove"                  : ["QSPIF"],
@@ -114,13 +109,7 @@
             "QUECTEL_BG96.cts"                          : "p35",
             "QUECTEL_BG96.rts"                          : "p36",
             "QUECTEL_BG96.pwr"                          : "P1_6",
-            "QUECTEL_BG96.rst"                          : "P1_5",
-            "storage.storage_type"                      : "TDB_INTERNAL",
-            "storage_tdb_internal.internal_size"        : "(32*1024)",
-            "storage_tdb_internal.internal_base_address": "(MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE)",
-            "fota.block-device-type"                    : "FOTA_INTERNAL_FLASH_BD",
-            "fota.storage-start-address"                : "MBED_ROM_START + MBED_BOOTLOADER_FLASH_BANK_SIZE + MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE",
-            "fota.storage-size"                         : "MBED_BOOTLOADER_FLASH_BANK_SIZE - MBED_CONF_STORAGE_TDB_INTERNAL_INTERNAL_SIZE"
+            "QUECTEL_BG96.rst"                          : "P1_5"
         }
     },
     "config": {

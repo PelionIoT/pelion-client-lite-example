@@ -22,6 +22,10 @@ void init_pdmc_client();
 
 void pdmc_client_close();
 
+// init connection with retry logic. Will reboot if connection
+// does not succeed within reboot logic
+void init_connection();
+
 #ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
 void pdmc_client_resume();
 

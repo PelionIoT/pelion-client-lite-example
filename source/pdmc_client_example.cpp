@@ -60,6 +60,11 @@ registry_callback_token_t   execute_token;
 #ifndef MAX_PDMC_CLIENT_ERROR_COUNT
 #define MAX_PDMC_CLIENT_ERROR_COUNT 5
 #endif
+
+// starting with 5s, after every iteration waiting time is multiplied by 2 -> max waiting time is with 9 is 1280s (~21min)
+// it is this long as with bad cellular rssi register and plmn selection might take 5mins so we wan't to give it a few tries.
+#define MAX_PDMC_CLIENT_INIT_CONNECTION_ERROR_COUNT 9
+
 static int                  pdmc_client_error_count = 0;
 
 static void register_pdmc_client();
@@ -73,7 +78,7 @@ static void send_application_response(void *);
 static bool init_example_resources();
 
 #ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
-static bool request_next_wake_up();
+static void request_next_wake_up();
 static void handle_wake_up();
 #endif
 
@@ -87,9 +92,9 @@ static void sleep_callback_function(void* context)
     // context is lwm2m_interface pointer
     (void)context;
     printf("Client is going to sleep\n");
-    paused = true;
     pdmc_connect_pause();
     close_connection();
+    paused = true;
 }
 #endif
 
@@ -163,6 +168,14 @@ static void value_updated_event(void)
     printf("Value updated\n");
 }
 
+static void reboot_if_threshold_value(int threshold) {
+    if (++pdmc_client_error_count == threshold) {
+        printf("Max error count %d reached, rebooting.\n\n", threshold);
+        do_wait(1*1000);
+        mbed_client_default_reboot();
+    }
+}
+
 static void pdmc_client_error_event(lwm2m_interface_error_t error_code)
 {
 #if !defined(DISABLE_ERROR_DESCRIPTION) || (DISABLE_ERROR_DESCRIPTION == 0)
@@ -221,18 +234,15 @@ static void pdmc_client_error_event(lwm2m_interface_error_t error_code)
 
     if (error_code == LWM2M_INTERFACE_ERROR_NETWORK_ERROR ||
         error_code == LWM2M_INTERFACE_ERROR_DNS_RESOLVING_FAILED ||
-        error_code == LWM2M_INTERFACE_ERROR_SECURE_CONNECTION_FAILED) {
-        if (++pdmc_client_error_count == MAX_PDMC_CLIENT_ERROR_COUNT) {
-            printf("Max error count %d reached, rebooting.\n\n", MAX_PDMC_CLIENT_ERROR_COUNT);
-            do_wait(1*1000);
-            mbed_client_default_reboot();
-        }
+        error_code == LWM2M_INTERFACE_ERROR_SECURE_CONNECTION_FAILED ||
+        error_code == LWM2M_INTERFACE_ERROR_TIMEOUT) {
+            reboot_if_threshold_value(MAX_PDMC_CLIENT_ERROR_COUNT);
     }
 }
 
 static void pdmc_event_handler(arm_event_t *event)
 {
-    if (event->event_type == 0 && event->event_id == 0) {
+    if (event->event_type == PDMC_CONNECT_STARTUP_EVENT_TYPE) {
         return;
     }
 
@@ -373,7 +383,7 @@ void register_pdmc_client()
 void init_pdmc_client(void)
 {
     ns_hal_init(NULL, MBED_CLIENT_EVENT_LOOP_SIZE, NULL, NULL);
-    pdmc_event_handler_id = eventOS_event_handler_create(pdmc_event_handler, 0);
+    pdmc_event_handler_id = eventOS_event_handler_create(pdmc_event_handler, PDMC_CONNECT_STARTUP_EVENT_TYPE);
 
     pdmc_connect_init(pdmc_event_handler_id);
 
@@ -398,21 +408,27 @@ void pdmc_client_close()
     pdmc_connect_close();
 }
 
+void init_connection()
+{
+    pdmc_client_error_count = 0;
+    int timeout_ms = 5000;
+
+    while (!init_connection(-1)) {
+        // wait timeout is always doubled
+        printf("Network init connect failed. Try again after %d milliseconds.\n",timeout_ms);
+        do_wait(timeout_ms);
+        timeout_ms *= 2;
+
+        reboot_if_threshold_value(MAX_PDMC_CLIENT_INIT_CONNECTION_ERROR_COUNT);
+    }
+}
+
 #ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
 void pdmc_client_resume()
 {
-    int timeout_ms = 1000;
-    while (!init_connection(-1)){
-        // wait timeout is always doubled
-        printf("Network connect failed. Try again after %d milliseconds.\n",timeout_ms);
-        do_wait(timeout_ms);
-        timeout_ms *= 2;
-    }
-    pdmc_connect_resume(get_network_interface(-1));
     paused = false;
-    while(!registered) {
-        do_wait(1000);
-    }
+    init_connection();
+    pdmc_connect_resume(get_network_interface(-1));
 }
 
 bool is_pdmc_client_paused()
@@ -487,14 +503,21 @@ void update_progress(uint32_t progress, uint32_t total)
 #endif // MBED_CLOUD_CLIENT_SUPPORT_UPDATE
 
 #ifdef MBED_CLOUD_CLIENT_TRANSPORT_MODE_UDP_QUEUE
+static bool wake_up_requested = false;
+
 static void wake_up_event_handler_wrapper(arm_event_s *event)
 {
     if (event->event_type == WAKE_UP_LOOP_WAKE_EVENT) {
+        wake_up_requested = false;
         handle_wake_up();
     }
 }
 
-static bool request_next_wake_up() {
+static void request_next_wake_up() {
+    if (wake_up_requested == true) {
+        return;
+    }
+
     if (wake_up_handler < 0) {
         wake_up_handler = eventOS_event_handler_create(wake_up_event_handler_wrapper, WAKE_UP_LOOP_INIT_EVENT);
     }
@@ -510,10 +533,11 @@ static bool request_next_wake_up() {
     const int32_t delay_ticks = eventOS_event_timer_ms_to_ticks(WAKE_UP_LOOP_INTERVAL_MS);
 
     if (eventOS_event_send_after(&event, delay_ticks) == NULL) {
-        return false;
-    } else {
-        return true;
+        printf("eventOS_event_send_after failed! Must reboot!\n\n");
+        do_wait(1*1000);
+        mbed_client_default_reboot();
     }
+    wake_up_requested = true;
 }
 
 static void handle_wake_up()
