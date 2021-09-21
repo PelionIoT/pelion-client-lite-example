@@ -1,5 +1,6 @@
 source/platform/linux/*
 __x86_x64_NativeLinux_mbedtls/*
+__*/*
 lwm2m-resource/*
 venv/*
 delta-tool/*

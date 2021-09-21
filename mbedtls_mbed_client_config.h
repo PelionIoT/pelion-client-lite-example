@@ -128,6 +128,12 @@
 
 #undef MBEDTLS_FS_IO
 
+// Need MBEDTLS_SSL_CONTEXT_SERIALIZATION and MBEDTLS_SSL_DTLS_CONNECTION_ID for CID feature
+// This requires Mbed TLS 2.18.0 or later.
+#define MBEDTLS_SSL_CONTEXT_SERIALIZATION
+#define MBEDTLS_SSL_DTLS_CONNECTION_ID
+
+
 #include "mbedtls/check_config.h"
 
 #endif /* MBEDTLS_USER_CONFIG_H */

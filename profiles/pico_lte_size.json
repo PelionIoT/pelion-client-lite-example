@@ -4,7 +4,7 @@
                    "-Wno-unused-parameter", "-Wno-missing-field-initializers",
                    "-fmessage-length=0", "-fno-exceptions",
                    "-ffunction-sections", "-fdata-sections", "-funsigned-char",
-                   "-MMD", "-fno-delete-null-pointer-checks",
+                   "-MMD",
                    "-fomit-frame-pointer", "-Os", "-DNDEBUG", "-g1"],
         "asm": ["-c", "-x", "assembler-with-cpp"],
         "c": ["-c", "-std=gnu11", "-ffunction-sections", "-fdata-sections"],
@@ -23,8 +23,8 @@
                    "-fshort-enums", "-fshort-wchar", "-DNDEBUG"],
         "asm": [],
         "c": ["-D__ASSERT_MSG", "-std=gnu11"],
-        "cxx": ["-fno-rtti", "-std=gnu++14"],
-        "ld": ["--show_full_path", "--legacyalign", "--any_contingency",
+        "cxx": ["-fno-rtti", "-fno-c++-static-destructors", "-std=gnu++14"],
+        "ld": ["--show_full_path", "--legacyalign", "--inline", "--any_contingency",
                "--keep=os_cb_sections", "--callgraph", "--info sizes"]
     },
     "ARM": {
@@ -34,7 +34,7 @@
         "asm": [],
         "c": ["--md", "--no_depend_system_headers", "--c99", "-D__ASSERT_MSG"],
         "cxx": ["--cpp11", "--no_rtti", "--no_vla"],
-        "ld": ["--show_full_path", "--any_contingency", "--keep=os_cb_sections"]
+        "ld": ["--show_full_path", "--any_contingency", "--inline", "--keep=os_cb_sections"]
     },
     "uARM": {
         "common": ["-c", "--gnu", "-Ospace", "--split_sections",
@@ -44,7 +44,7 @@
         "asm": [],
         "c": ["--md", "--no_depend_system_headers", "--c99", "-D__ASSERT_MSG"],
         "cxx": ["--cpp11", "--no_rtti", "--no_vla"],
-        "ld": ["--library_type=microlib"]
+        "ld": ["--inline", "--library_type=microlib"]
     },
     "IAR": {
         "common": [
@@ -53,6 +53,6 @@
         "asm": [],
         "c": ["--vla", "--diag_suppress=Pe546"],
         "cxx": ["--guard_calls", "--no_static_destruction"],
-        "ld": ["--skip_dynamic_initialization", "--threaded_lib"]
+        "ld": ["--skip_dynamic_initialization", "--threaded_lib", "--inline"]
     }
 }

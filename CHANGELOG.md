@@ -1,5 +1,17 @@
 # Changelog for Pelion Device Management Client Lite Reference Example
 
+### Release 1.4.0-lite (21.09.2021)
+
+* Fixed bug where application assumed that event_id and event_type are both 0 when event handler is initialized. Now uses `PDMC_CONNECT_STARTUP_EVENT_TYPE -1 ` from client's LWM2M interface when creating own event handler. 
+* [Mbed OS] Updated ISM43362 WiFi driver to #3813a4b with fixes for logging and UDP socket handling.
+* Bootloader changes:
+    1. Changed the bootloader library name from `tools.lib` to `prebuilt-bl.lib`.
+    1. The new bootloader library contains a bootloader binary image and an `mbed_lib.json` file for each target in the `prebuilt-bl/TARGET_target_name/TARGET_BL_INTERNAL_FLASH` directory. The `mbed_lib.json` file defines common configurations for the bootloader and the application, including the bootloader flash bank size; the storage type, address and size; firmware-over-the-air (FOTA) storage configurations; `header_format` and `restricted_size`.
+    1. Added the `target.bootloader_img` parameter to the `mbed_lib.json` file of the bootloader. This parameter defines the path to the bootloader image.
+    1. Set the storage configuration to `null` in the `mbed_app.json` file to ignore the default storage configuration. As a result, the build system uses the configuration defined by the `mbed_lib.json` file of the bootloader.
+* [Mbed OS] Updated to 6.12.0:
+    1. minimal-printf is now enabled by default. It can be disabled by adding `"target.printf_lib": "std"` to the application configuration. For example, using `float` type LWM2M resources would require disabling minimal-printf.
+
 ### Release 1.3.0-lite (07.12.2020)
 
 - Changed how the example application behaves when network connect fails. Now the application retries to connect after a timeout.
